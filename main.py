@@ -4,6 +4,7 @@
 
 import scapy.all
 import argparse
+import collections
 import sys
 import networkx as nx
 from jinja2 import Environment, FileSystemLoader
@@ -25,54 +26,63 @@ def _args():
 def _parse_pcap(pcap):
     """The _parse_pcap function uses the scapy library to parse through a pcap for traffic data
     :param pcap: A raw pcap that needs to be parsed
-    :return: A parsed pcap for visualization"""
+    :return Nothing:"""
     print("Parsing " + str(pcap) + "...")
     pkt = scapy.all.rdpcap(pcap)
+    src_ip_list = []
+    dst_ip_list = []
     for packet in pkt:
         try:
-            get_transport(packet)
-            get_ip(packet)
-            get_mac(packet)
-            print()
+            ip = get_src_ip(packet)
+            dip = get_dst_ip(packet)
+            src_ip_list.append(ip)
+            dst_ip_list.append(dip)
         except IndexError:
             continue
-    return pkt
+    statistics(src_ip_list, dst_ip_list)
 
 
 def get_transport(packet):
-    """
-
+    """The get_transport function extracts the transport protocol from the input packet
     :param packet:
-    :return:
-    """
+    :return the transport protocol (TCP/UDP):"""
     if TCP in packet:
         transport = 'TCP'
-        print(transport)
+        return transport
     elif UDP in packet:
         transport = 'UDP'
-        print(transport)
+        return transport
 
 
-def get_ip(packet):
-    """
-
+def get_src_ip(packet):
+    """The get_src_ip function extracts the source IP from the input packet
     :param packet:
-    :return:
-    """
+    :return the source IP address:"""
     src = packet['IP.src']
-    dst = packet['IP.dst']
-    print(src + " -> " + dst)
+    return src
 
 
-def get_mac(packet):
-    """
-
+def get_dst_ip(packet):
+    """The get_dst_ip function extracts the destination IP from the input packet
     :param packet:
-    :return:
-    """
+    :return the destination IP address:"""
+    dst = packet['IP.dst']
+    return dst
+
+
+def get_src_mac(packet):
+    """The get_src_mac function extracts the source MAC address from the input packet
+    :param packet:
+    :return the source MAC address:"""
     src = packet['Ether.src']
+    return src
+
+def get_dst_mac(packet):
+    """The get_dst_mac function extracts the destination MAC address from the input packet
+    :param packet:
+    :return the destination MAC address:"""
     dst = packet['Ether.dst']
-    print(src + " -> " + dst)
+    return dst
 
 
 def visualize(filename, parsed_pcap):
@@ -89,13 +99,21 @@ def visualize(filename, parsed_pcap):
     # return parsed_pcap
 
 
-def statistics(parsed_pcap):
+def statistics(src_ip_list, dst_ip_list):
     """The statistics function takes a parsed through pcap as input, analyzes the contents and appends the data
     to a text file for statistics. The statistics are then printed.
-    :param parsed_pcap: A pcap that has been parsed through
+    :param src_ip_list: A list of source IP addresses from the pcap file
+    :param dst_ip_list: A list of destination IP addresses from the pcap file
     :return: Statistics for the hosts in a subnet"""
     print("Calculating statistics...")
-    return parsed_pcap
+    src_ip_count = collections.Counter(src_ip_list)
+    dst_ip_count = collections.Counter(dst_ip_list)
+    for key, value in src_ip_count.items():
+        print(f"IP Address {key} has sent {value} packets")
+    print("--------------------------")
+    for key, value in dst_ip_count.items():
+        print(f"IP Address {key} has received {value} packets")
+    return src_ip_list
 
 
 def main():
@@ -103,9 +121,8 @@ def main():
     adds to the statistics of the subnet
     :return: nothing"""
     args = _args()
-    pkt = _parse_pcap(args.pcap_file)
-    visualize(args.pcap_file, pkt)
-    statistics(pkt)
+    _parse_pcap(args.pcap_file)
+    # visualize(args.pcap_file, pkt)
     print(str(args.pcap_file) + " has been analyzed")
 
     sys.exit(0)
