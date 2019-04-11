@@ -6,10 +6,11 @@ import scapy.all
 import argparse
 import sys
 import networkx as nx
-import matplotlib.pyplot as plt
+from jinja2 import Environment, FileSystemLoader
+from scapy.layers.inet import TCP, UDP, ICMP
 
 __author__ = 'Amanda Sossong'
-__date__ = '20190322'
+__date__ = '20190419'
 __version__ = '1.0'
 
 
@@ -25,27 +26,67 @@ def _parse_pcap(pcap):
     """The _parse_pcap function uses the scapy library to parse through a pcap for traffic data
     :param pcap: A raw pcap that needs to be parsed
     :return: A parsed pcap for visualization"""
-    # print("Parsing " + str(pcap) + "...")
+    print("Parsing " + str(pcap) + "...")
     pkt = scapy.all.rdpcap(pcap)
-    netgraph = nx.Graph()
     for packet in pkt:
         try:
-            print(f"{packet['IP.src']}, {packet['Ether.src']} -> {packet['IP.dst']}, {packet['Ether.dst']}")
-            netgraph.add_nodes_from([packet['IP.src'], packet['IP.dst']])
-            netgraph.add_edge((packet['IP.src']), (packet['IP.dst']))
+            get_transport(packet)
+            get_ip(packet)
+            get_mac(packet)
+            print()
         except IndexError:
             continue
-    nx.draw(netgraph, with_labels=True, font_weight='bold')
+    return pkt
 
 
-def visualize(parsed_pcap):
+def get_transport(packet):
+    """
+
+    :param packet:
+    :return:
+    """
+    if TCP in packet:
+        transport = 'TCP'
+        print(transport)
+    elif UDP in packet:
+        transport = 'UDP'
+        print(transport)
+
+
+def get_ip(packet):
+    """
+
+    :param packet:
+    :return:
+    """
+    src = packet['IP.src']
+    dst = packet['IP.dst']
+    print(src + " -> " + dst)
+
+
+def get_mac(packet):
+    """
+
+    :param packet:
+    :return:
+    """
+    src = packet['Ether.src']
+    dst = packet['Ether.dst']
+    print(src + " -> " + dst)
+
+
+def visualize(filename, parsed_pcap):
     """The visualize function takes a parsed pcap as input, analyzes the contents and creates a visualization
+    :param filename: name of the pcap file
     :param parsed_pcap: A pcap that has been parsed through
     :return: A visual representation of the pcap data"""
-    print("Visualizing " + str(parsed_pcap) + "...")
-    netgraph = nx.Graph()
-
-    return parsed_pcap
+    print("Visualizing " + str(filename) + "...")
+    file_loader = FileSystemLoader('templates')
+    env = Environment(loader=file_loader)
+    template = env.get_template('capmap.html')
+    output = template.render(pkt=parsed_pcap)
+    # print(output)
+    # return parsed_pcap
 
 
 def statistics(parsed_pcap):
@@ -62,13 +103,12 @@ def main():
     adds to the statistics of the subnet
     :return: nothing"""
     args = _args()
-    _parse_pcap(args.pcap_file)
-    visualize(args.pcap_file)
-    statistics(args.pcap_file)
+    pkt = _parse_pcap(args.pcap_file)
+    visualize(args.pcap_file, pkt)
+    statistics(pkt)
     print(str(args.pcap_file) + " has been analyzed")
 
     sys.exit(0)
-    # print("Hello World!")
 
 
 if __name__ == '__main__':
