@@ -6,6 +6,8 @@ import scapy.all
 import argparse
 import collections
 import sys
+import os
+import webbrowser
 import networkx as nx
 from jinja2 import Environment, FileSystemLoader
 from scapy.layers.inet import TCP, UDP, ICMP
@@ -30,90 +32,70 @@ def _parse_pcap(pcap):
     print("Parsing " + str(pcap) + "...")
     pkt = scapy.all.rdpcap(pcap)
     src_ip_list = []
-    dst_ip_list = []
+    src_mac_list = []
+    src_port_list = []
     for packet in pkt:
         try:
-            ip = get_src_ip(packet)
-            dip = get_dst_ip(packet)
-            src_ip_list.append(ip)
-            dst_ip_list.append(dip)
+            s = packet['IP.src']
+            d = packet['IP.dst']
+            if TCP in packet:
+                src_ip_list.append('TCP')
+                src_ip_list.append(s)
+                src_ip_list.append(d)
+                sp = packet['TCP.sport']
+                dp = packet['TCP.dport']
+                src_port_list.append(sp)
+                src_port_list.append(dp)
+            elif UDP in packet:
+                src_ip_list.append('UDP')
+                src_ip_list.append(s)
+                src_ip_list.append(d)
+                sp = packet['UDP.sport']
+                dp = packet['UDP.dport']
+                src_port_list.append(sp)
+                src_port_list.append(dp)
         except IndexError:
             continue
-    statistics(src_ip_list, dst_ip_list)
+    transport = src_ip_list[::3]
+    src_ips = src_ip_list[1::3]
+    dst_ips = src_ip_list[2::3]
+    src_macs = src_mac_list[::2]
+    dst_macs = src_mac_list[1::2]
+    print("DONE")
+    statistics(src_ips, src_port_list, transport)
 
 
-def get_transport(packet):
-    """The get_transport function extracts the transport protocol from the input packet
-    :param packet:
-    :return the transport protocol (TCP/UDP):"""
-    if TCP in packet:
-        transport = 'TCP'
-        return transport
-    elif UDP in packet:
-        transport = 'UDP'
-        return transport
+def statistics(ip_list, port_list, transport):
+    """The statistics function takes a parsed through pcap as input, analyzes the contents and appends the data
+    to a text file for statistics. The statistics are then printed.
+    :param ip_list: A list of sorted IP addresses from the pcap file
+    :param port_list: A list of ports from the pcap file
+    :param transport: A list of transport protocols from the pcap file
+    :return: Statistics for the hosts in a subnet"""
+    print("--------------------------\nPCAP Statistics Report\n--------------------------")
+    ip_count = collections.Counter(ip_list)
+    port_count = collections.Counter(port_list)
+    trans_count = collections.Counter(transport)
+    # mac_count = collections.Counter(mac_list)
+    # print("--------------------------\nHost Transmissions\n--------------------------")
+    # for key, value in ip_count.items():
+    #     print(f"Host {key} has sent {value} packet(s)")
+    # print("--------------------------\nTransport Protocols\n--------------------------")
+    # for key, value in trans_count.items():
+    #     print(f"{key} Packets transmitted: {value}")
+    # print("--------------------------\n Port Numbers\n--------------------------")
+    # for key, value in port_count.items():
+    #     print(f"Port {key} was used {value} times")
+    # print("--------------------------")
 
-
-def get_src_ip(packet):
-    """The get_src_ip function extracts the source IP from the input packet
-    :param packet:
-    :return the source IP address:"""
-    src = packet['IP.src']
-    return src
-
-
-def get_dst_ip(packet):
-    """The get_dst_ip function extracts the destination IP from the input packet
-    :param packet:
-    :return the destination IP address:"""
-    dst = packet['IP.dst']
-    return dst
-
-
-def get_src_mac(packet):
-    """The get_src_mac function extracts the source MAC address from the input packet
-    :param packet:
-    :return the source MAC address:"""
-    src = packet['Ether.src']
-    return src
-
-def get_dst_mac(packet):
-    """The get_dst_mac function extracts the destination MAC address from the input packet
-    :param packet:
-    :return the destination MAC address:"""
-    dst = packet['Ether.dst']
-    return dst
-
-
-def visualize(filename, parsed_pcap):
-    """The visualize function takes a parsed pcap as input, analyzes the contents and creates a visualization
-    :param filename: name of the pcap file
-    :param parsed_pcap: A pcap that has been parsed through
-    :return: A visual representation of the pcap data"""
-    print("Visualizing " + str(filename) + "...")
     file_loader = FileSystemLoader('templates')
     env = Environment(loader=file_loader)
     template = env.get_template('capmap.html')
-    output = template.render(pkt=parsed_pcap)
-    # print(output)
-    # return parsed_pcap
-
-
-def statistics(src_ip_list, dst_ip_list):
-    """The statistics function takes a parsed through pcap as input, analyzes the contents and appends the data
-    to a text file for statistics. The statistics are then printed.
-    :param src_ip_list: A list of source IP addresses from the pcap file
-    :param dst_ip_list: A list of destination IP addresses from the pcap file
-    :return: Statistics for the hosts in a subnet"""
-    print("Calculating statistics...")
-    src_ip_count = collections.Counter(src_ip_list)
-    dst_ip_count = collections.Counter(dst_ip_list)
-    for key, value in src_ip_count.items():
-        print(f"IP Address {key} has sent {value} packets")
-    print("--------------------------")
-    for key, value in dst_ip_count.items():
-        print(f"IP Address {key} has received {value} packets")
-    return src_ip_list
+    render = template.render(data=ip_count, trans=trans_count, ports=port_count)
+    filename = os.path.abspath("html/index.html")
+    with open(filename, 'w') as f:
+        f.write(render)
+    webbrowser.open_new_tab(filename)
 
 
 def main():
@@ -122,7 +104,6 @@ def main():
     :return: nothing"""
     args = _args()
     _parse_pcap(args.pcap_file)
-    # visualize(args.pcap_file, pkt)
     print(str(args.pcap_file) + " has been analyzed")
 
     sys.exit(0)
