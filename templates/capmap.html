@@ -12,6 +12,10 @@
 </head>
 <body>
     <h1>capmap</h1>
+    <h3>Network Graph:</h3>
+    <img src="../graph-output/net-map.jpeg" width="1500em" height="500em" alt="The Network Graph">
+    <h3>Statistics:</h3>
+    <h4>Source Hosts</h4>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -28,10 +32,12 @@
             {% endfor %}
         </tbody>
     </table>
+    <h4>Transport Protocols</h4>
     {% for key, value in trans.items() %}
         <p>{{ key }} Packets Transmitted: {{ value }}</p>
     {% endfor %}
     <br>
+    <h4>Ports</h4>
     <table class="table table-bordered">
         <thead>
             <tr>

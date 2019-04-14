@@ -8,7 +8,7 @@ import collections
 import sys
 import os
 import webbrowser
-import networkx as nx
+from graphviz import Digraph
 from jinja2 import Environment, FileSystemLoader
 from scapy.layers.inet import TCP, UDP, ICMP
 
@@ -62,18 +62,20 @@ def _parse_pcap(pcap):
     src_macs = src_mac_list[::2]
     dst_macs = src_mac_list[1::2]
     print("DONE")
-    statistics(src_ips, src_port_list, transport)
+    statistics(src_ips, dst_ips, src_port_list, transport)
 
 
-def statistics(ip_list, port_list, transport):
+def statistics(src_ips, dst_ips, port_list, transport):
     """The statistics function takes a parsed through pcap as input, analyzes the contents and appends the data
     to a text file for statistics. The statistics are then printed.
-    :param ip_list: A list of sorted IP addresses from the pcap file
+    :param src_ips: A list of source addresses from the pcap file
+    :param dst_ips: A list of destination addresses from the pcap file
     :param port_list: A list of ports from the pcap file
     :param transport: A list of transport protocols from the pcap file
     :return: Statistics for the hosts in a subnet"""
     print("--------------------------\nPCAP Statistics Report\n--------------------------")
-    ip_count = collections.Counter(ip_list)
+    ip_count = collections.Counter(src_ips)
+    dests = collections.Counter(dst_ips)
     port_count = collections.Counter(port_list)
     trans_count = collections.Counter(transport)
     # mac_count = collections.Counter(mac_list)
@@ -87,7 +89,19 @@ def statistics(ip_list, port_list, transport):
     # for key, value in port_count.items():
     #     print(f"Port {key} was used {value} times")
     # print("--------------------------")
+    # print(type(ip_count))
 
+    dot = Digraph(comment='Network Diagram', format='jpeg')
+    dot.attr('node', shape='square')
+    already_done = []
+    for address_pair in zip(src_ips, dst_ips):
+        if address_pair not in already_done:
+            dot.node(address_pair[0])
+            dot.node(address_pair[1])
+            dot.edge(address_pair[0], address_pair[1])
+            already_done.append(address_pair)
+
+    dot.render('graph-output/net-map')
     file_loader = FileSystemLoader('templates')
     env = Environment(loader=file_loader)
     template = env.get_template('capmap.html')
