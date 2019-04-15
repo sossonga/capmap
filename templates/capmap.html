@@ -17,16 +17,19 @@
     <h3>Network Graph:</h3>
     <img id="net-img" src="../graph-output/net-map.svg" width="100%" height="500em" alt="The Network Graph">
     <h3>Statistics:</h3>
-    <h4>Source Hosts</h4>
+    <h4>Conversations</h4>
     <table class="table-bordered">
         <tr>
-            <th scope="col">Source IP</th>
-            <th scope="col">Packets Sent</th>
+            <th scope="col">Conversations</th>
+            <th scope="col"># of Times</th>
         </tr>
-        {% for key, value in data.items() %}
+        {% for key, value in packets.items() %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
+            {% for line in lengths %}
+                <td>{{ line }}</td>
+            {% endfor %}
         </tr>
         {% endfor %}
     </table>
@@ -72,7 +75,7 @@
     <table class="table-bordered">
         <tr>
             <th scope="col">Port Number</th>
-            <th scope="col">Times Used</th>
+            <th scope="col"># Times Used</th>
         </tr>
         {% for key, value in ports.items() %}
         <tr>
