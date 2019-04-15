@@ -56,7 +56,10 @@ in templates/capmap.html:
 ```
 
 ### graphviz
-capmap uses the [graphviz](https://graphviz.readthedocs.io/en/stable/) library to create a graph of the network hosts and saves it to a .svg file.
+capmap uses the [graphviz](https://graphviz.readthedocs.io/en/stable/) library to create a graph of the network hosts and saves it to a .svg file.  
+
+
+![Image of Network Graph](graph-output/net-map.svg)
 ```
 dot = Digraph(comment='Network Diagram', format='svg')
     for address_pair in zip(src_ips, dst_ips):
@@ -77,8 +80,3 @@ On the command line, enter the path of the pcap file after the script path.
 ```
 python3 main.py pcaps/test.pcap
 ```
-
-## Future Work
-* [ ] Perform packet capture with scapy and analyze the output
-* [ ] Analyze packet load
-* [ ] Option for command-line only instead of HTML output
