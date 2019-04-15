@@ -3,423 +3,864 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Capmap Output</title>
+    <title>capmap Output</title>
 
     <!-- bootstrap CDN import -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="capmap.css">
+    <script src="zoom.js" type="text/javascript"></script>
 </head>
 <body>
     <h1>capmap</h1>
     <h3>Network Graph:</h3>
-    <img src="../graph-output/net-map.jpeg" width="1500em" height="500em" alt="The Network Graph">
+    <img id="net-img" src="../graph-output/net-map.svg" width="100%" height="500em" alt="The Network Graph">
     <h3>Statistics:</h3>
     <h4>Source Hosts</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">Source IP</th>
-                <th scope="col">Packets Sent</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            <tr>
-                <td>72.21.91.29</td>
-                <td>5</td>
-            </tr>
-            
-            <tr>
-                <td>162.125.18.133</td>
-                <td>26</td>
-            </tr>
-            
-            <tr>
-                <td>192.168.1.121</td>
-                <td>7</td>
-            </tr>
-            
-            <tr>
-                <td>192.168.1.1</td>
-                <td>49</td>
-            </tr>
-            
-            <tr>
-                <td>192.168.1.103</td>
-                <td>111</td>
-            </tr>
-            
-            <tr>
-                <td>192.168.1.14</td>
-                <td>4</td>
-            </tr>
-            
-            <tr>
-                <td>52.173.26.181</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>52.109.20.3</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>52.109.8.21</td>
-                <td>16</td>
-            </tr>
-            
-            <tr>
-                <td>13.107.3.128</td>
-                <td>11</td>
-            </tr>
-            
-            <tr>
-                <td>173.194.205.189</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>34.235.3.239</td>
-                <td>23</td>
-            </tr>
-            
-            <tr>
-                <td>173.194.175.189</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>209.85.201.189</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>172.217.197.189</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>192.168.1.51</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>172.217.6.197</td>
-                <td>14</td>
-            </tr>
-            
-            <tr>
-                <td>107.20.240.232</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>0.0.0.0</td>
-                <td>1</td>
-            </tr>
-            
-        </tbody>
+    <table class="table-bordered">
+        <tr>
+            <th scope="col">Source IP</th>
+            <th scope="col">Packets Sent</th>
+        </tr>
+        
+        <tr>
+            <td>72.21.91.29</td>
+            <td>5</td>
+        </tr>
+        
+        <tr>
+            <td>162.125.18.133</td>
+            <td>26</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.121</td>
+            <td>7</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>49</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>111</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.14</td>
+            <td>4</td>
+        </tr>
+        
+        <tr>
+            <td>52.173.26.181</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>52.109.20.3</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>52.109.8.21</td>
+            <td>16</td>
+        </tr>
+        
+        <tr>
+            <td>13.107.3.128</td>
+            <td>11</td>
+        </tr>
+        
+        <tr>
+            <td>173.194.205.189</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>34.235.3.239</td>
+            <td>23</td>
+        </tr>
+        
+        <tr>
+            <td>173.194.175.189</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>209.85.201.189</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>172.217.197.189</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.51</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>172.217.6.197</td>
+            <td>14</td>
+        </tr>
+        
+        <tr>
+            <td>107.20.240.232</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>0.0.0.0</td>
+            <td>1</td>
+        </tr>
+        
     </table>
+    <br>
+    <h4>DNS Queries</h4>
+    <table class="table-bordered">
+        <tr>
+            <th scope="col">Source IP</th>
+            <th scope="col">Source Port</th>
+            <th scope="col">DNS Query</th>
+            <th scope="col">Destination IP</th>
+            <th scope="col">Destination Port</th>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61125</td>
+            <td>officeclient.microsoft.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>officeclient.microsoft.com.</td>
+            <td>192.168.1.103</td>
+            <td>61125</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>53427</td>
+            <td>config.edge.skype.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61004</td>
+            <td>nexusrules.officeapps.live.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>nexusrules.officeapps.live.com.</td>
+            <td>192.168.1.103</td>
+            <td>61004</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>config.edge.skype.com.</td>
+            <td>192.168.1.103</td>
+            <td>53427</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61005</td>
+            <td>1.1.168.192.in-addr.arpa.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>1.1.168.192.in-addr.arpa.</td>
+            <td>192.168.1.103</td>
+            <td>61005</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61006</td>
+            <td>reddit.com.wit.private.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>reddit.com.wit.private.</td>
+            <td>192.168.1.103</td>
+            <td>61006</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61007</td>
+            <td>reddit.com.wit.private.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>reddit.com.wit.private.</td>
+            <td>192.168.1.103</td>
+            <td>61007</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61008</td>
+            <td>reddit.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>reddit.com.</td>
+            <td>192.168.1.103</td>
+            <td>61008</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>61009</td>
+            <td>reddit.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>reddit.com.</td>
+            <td>192.168.1.103</td>
+            <td>61009</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56576</td>
+            <td>xmpp-service-prod.ol.epicgames.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>xmpp-service-prod.ol.epicgames.com.</td>
+            <td>192.168.1.103</td>
+            <td>56576</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56577</td>
+            <td>1.1.168.192.in-addr.arpa.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>1.1.168.192.in-addr.arpa.</td>
+            <td>192.168.1.103</td>
+            <td>56577</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56578</td>
+            <td>google.com.wit.private.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>google.com.wit.private.</td>
+            <td>192.168.1.103</td>
+            <td>56578</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56579</td>
+            <td>google.com.wit.private.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>google.com.wit.private.</td>
+            <td>192.168.1.103</td>
+            <td>56579</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56580</td>
+            <td>google.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>google.com.</td>
+            <td>192.168.1.103</td>
+            <td>56580</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>56581</td>
+            <td>google.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>google.com.</td>
+            <td>192.168.1.103</td>
+            <td>56581</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.51</td>
+            <td>5353</td>
+            <td>_airplay._tcp.local.</td>
+            <td>224.0.0.251</td>
+            <td>5353</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>5353</td>
+            <td>_airplay._tcp.local.</td>
+            <td>224.0.0.251</td>
+            <td>5353</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>53654</td>
+            <td>mail.google.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>mail.google.com.</td>
+            <td>192.168.1.103</td>
+            <td>53654</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>51429</td>
+            <td>googlemail.l.google.com.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>googlemail.l.google.com.</td>
+            <td>192.168.1.103</td>
+            <td>51429</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+            <td>197.6.217.172.ip.08.s.sophosxl.net.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>197.6.217.172.ip.08.s.sophosxl.net.</td>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>51971</td>
+            <td>wpad.wit.private.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>wpad.wit.private.</td>
+            <td>192.168.1.103</td>
+            <td>51971</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>55076</td>
+            <td>wpad.localdomain.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>wpad.localdomain.</td>
+            <td>192.168.1.103</td>
+            <td>55076</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.1</td>
+            <td>53</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>53</td>
+            <td>znvy.tbbtyr.pbz.m.08.s.sophosxl.net.</td>
+            <td>192.168.1.103</td>
+            <td>57227</td>
+        </tr>
+        
+    </table>
+    <br>
+    <h4>ARP Requests and Replies</h4>
+    <p>Request: 1 / Reply: 2</p>
+    <table class="table-bordered">
+        <tr>
+            <th>Source IP</th>
+            <th>Destination IP</th>
+            <th>Opcode</th>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>192.168.1.1</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>192.168.1.103</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>192.168.1.122</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>192.168.1.122</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>192.168.1.1</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.1</td>
+            <td>192.168.1.103</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.14</td>
+            <td>192.168.1.103</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.103</td>
+            <td>192.168.1.14</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>192.168.1.59</td>
+            <td>192.168.1.1</td>
+            <td>1</td>
+        </tr>
+        
+    </table>
+    <h4>Ports</h4>
+    <table class="table-bordered">
+        <tr>
+            <th scope="col">Port Number</th>
+            <th scope="col">Times Used</th>
+        </tr>
+        
+        <tr>
+            <td>80</td>
+            <td>5</td>
+        </tr>
+        
+        <tr>
+            <td>52756</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52763</td>
+            <td>3</td>
+        </tr>
+        
+        <tr>
+            <td>443</td>
+            <td>141</td>
+        </tr>
+        
+        <tr>
+            <td>52773</td>
+            <td>9</td>
+        </tr>
+        
+        <tr>
+            <td>59249</td>
+            <td>3</td>
+        </tr>
+        
+        <tr>
+            <td>1900</td>
+            <td>36</td>
+        </tr>
+        
+        <tr>
+            <td>10112</td>
+            <td>21</td>
+        </tr>
+        
+        <tr>
+            <td>52796</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>445</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>52371</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>52791</td>
+            <td>6</td>
+        </tr>
+        
+        <tr>
+            <td>52768</td>
+            <td>4</td>
+        </tr>
+        
+        <tr>
+            <td>8192</td>
+            <td>4</td>
+        </tr>
+        
+        <tr>
+            <td>17500</td>
+            <td>10</td>
+        </tr>
+        
+        <tr>
+            <td>52789</td>
+            <td>3</td>
+        </tr>
+        
+        <tr>
+            <td>61125</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>53</td>
+            <td>44</td>
+        </tr>
+        
+        <tr>
+            <td>52823</td>
+            <td>16</td>
+        </tr>
+        
+        <tr>
+            <td>53427</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>61004</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52824</td>
+            <td>16</td>
+        </tr>
+        
+        <tr>
+            <td>52825</td>
+            <td>16</td>
+        </tr>
+        
+        <tr>
+            <td>52826</td>
+            <td>19</td>
+        </tr>
+        
+        <tr>
+            <td>61005</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>61006</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52820</td>
+            <td>4</td>
+        </tr>
+        
+        <tr>
+            <td>61007</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>61008</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>61009</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>56576</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52827</td>
+            <td>43</td>
+        </tr>
+        
+        <tr>
+            <td>5222</td>
+            <td>43</td>
+        </tr>
+        
+        <tr>
+            <td>52692</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>62638</td>
+            <td>12</td>
+        </tr>
+        
+        <tr>
+            <td>52813</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52422</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>52778</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>56577</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>56578</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>56579</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>56580</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>56581</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52471</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>5353</td>
+            <td>4</td>
+        </tr>
+        
+        <tr>
+            <td>138</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>53654</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>51429</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>52829</td>
+            <td>25</td>
+        </tr>
+        
+        <tr>
+            <td>57227</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>52718</td>
+            <td>8</td>
+        </tr>
+        
+        <tr>
+            <td>52797</td>
+            <td>5</td>
+        </tr>
+        
+        <tr>
+            <td>51971</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>55076</td>
+            <td>2</td>
+        </tr>
+        
+        <tr>
+            <td>68</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>67</td>
+            <td>1</td>
+        </tr>
+        
+    </table>
+    <br>
     <h4>Transport Protocols</h4>
     
         <p>TCP Packets Transmitted: 201</p>
     
         <p>UDP Packets Transmitted: 89</p>
     
-    <br>
-    <h4>Ports</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">Port Number</th>
-                <th scope="col">Times Used</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            <tr>
-                <td>80</td>
-                <td>5</td>
-            </tr>
-            
-            <tr>
-                <td>52756</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52763</td>
-                <td>3</td>
-            </tr>
-            
-            <tr>
-                <td>443</td>
-                <td>141</td>
-            </tr>
-            
-            <tr>
-                <td>52773</td>
-                <td>9</td>
-            </tr>
-            
-            <tr>
-                <td>59249</td>
-                <td>3</td>
-            </tr>
-            
-            <tr>
-                <td>1900</td>
-                <td>36</td>
-            </tr>
-            
-            <tr>
-                <td>10112</td>
-                <td>21</td>
-            </tr>
-            
-            <tr>
-                <td>52796</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>445</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>52371</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>52791</td>
-                <td>6</td>
-            </tr>
-            
-            <tr>
-                <td>52768</td>
-                <td>4</td>
-            </tr>
-            
-            <tr>
-                <td>8192</td>
-                <td>4</td>
-            </tr>
-            
-            <tr>
-                <td>17500</td>
-                <td>10</td>
-            </tr>
-            
-            <tr>
-                <td>52789</td>
-                <td>3</td>
-            </tr>
-            
-            <tr>
-                <td>61125</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>53</td>
-                <td>44</td>
-            </tr>
-            
-            <tr>
-                <td>52823</td>
-                <td>16</td>
-            </tr>
-            
-            <tr>
-                <td>53427</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>61004</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52824</td>
-                <td>16</td>
-            </tr>
-            
-            <tr>
-                <td>52825</td>
-                <td>16</td>
-            </tr>
-            
-            <tr>
-                <td>52826</td>
-                <td>19</td>
-            </tr>
-            
-            <tr>
-                <td>61005</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>61006</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52820</td>
-                <td>4</td>
-            </tr>
-            
-            <tr>
-                <td>61007</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>61008</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>61009</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>56576</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52827</td>
-                <td>43</td>
-            </tr>
-            
-            <tr>
-                <td>5222</td>
-                <td>43</td>
-            </tr>
-            
-            <tr>
-                <td>52692</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>62638</td>
-                <td>12</td>
-            </tr>
-            
-            <tr>
-                <td>52813</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52422</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>52778</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>56577</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>56578</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>56579</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>56580</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>56581</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52471</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>5353</td>
-                <td>4</td>
-            </tr>
-            
-            <tr>
-                <td>138</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>53654</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>51429</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>52829</td>
-                <td>25</td>
-            </tr>
-            
-            <tr>
-                <td>57227</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>52718</td>
-                <td>8</td>
-            </tr>
-            
-            <tr>
-                <td>52797</td>
-                <td>5</td>
-            </tr>
-            
-            <tr>
-                <td>51971</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>55076</td>
-                <td>2</td>
-            </tr>
-            
-            <tr>
-                <td>68</td>
-                <td>1</td>
-            </tr>
-            
-            <tr>
-                <td>67</td>
-                <td>1</td>
-            </tr>
-            
-        </tbody>
-    </table>
+        <p>ICMP Packets Transmitted: 16</p>
+    
 </body>
 </html>
