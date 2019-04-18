@@ -51,10 +51,10 @@ file_loader = FileSystemLoader('templates')
 in templates/capmap.html:
 ```
 {% for key, value in packets %}
-        <tr>
-            <td>{{ key }}</td>
-            <td>{{ value }}</td>
-        </tr>
+<tr>
+    <td>{{ key }}</td>
+    <td>{{ value }}</td>
+</tr>
 {% endfor %}
 ```
 
@@ -65,25 +65,33 @@ capmap uses the [graphviz](https://graphviz.readthedocs.io/en/stable/) library t
 ![Image of Network Graph](graph-output/net-map.svg)
 ```
 net_diagram = Digraph(comment='Network Diagram', format='svg')
-    net_diagram.attr('node', shape='square')
-    # initialize list
-    already_done = []
-    # zip together source IPs and destination IPs
-    for address_pair in zip(src_ips, dst_ips):
-        if address_pair not in already_done:
-            # create nodes for the source IP and destination IP
-            net_diagram.node(address_pair[0])
-            net_diagram.node(address_pair[1])
-            # create an edge between the source and destination
-            net_diagram.edge(address_pair[0], address_pair[1])
-            # append to the list of matched hosts
-            already_done.append(address_pair)
-    # render a graph to the specified file
-    net_diagram.render('graph-output/net-map')
+net_diagram.attr('node', shape='square')
+# initialize list
+already_done = []
+# zip together source IPs and destination IPs
+for address_pair in zip(src_ips, dst_ips):
+    if address_pair not in already_done:
+        # create nodes for the source IP and destination IP
+        net_diagram.node(address_pair[0])
+        net_diagram.node(address_pair[1])
+        # create an edge between the source and destination
+        net_diagram.edge(address_pair[0], address_pair[1])
+        # append to the list of matched hosts
+        already_done.append(address_pair)
+# render a graph to the specified file
+net_diagram.render('graph-output/net-map')
 ```
 
-## Tutorial
-On the command line, enter the path of the pcap file after the script path.  
+## Usage
+Choose between analyzing an existing pcap or creating a new one.  
 ```
-python3 main.py pcaps/test.pcap
+usage: main.py [-h] (-p pcap | -s) [-n NUM]
+
+capmap outputs a visual and the statistics of a packet capture
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p pcap, --pcap pcap  A pcap file
+  -s, --scan            Start a packet capture
+  -n NUM, --num NUM     Number of packets to capture
 ```
