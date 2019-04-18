@@ -1,5 +1,6 @@
 # This script analyzes pcaps that have been captured and provides a visualization and statistics
 # Shows active IPs on a subnet, how many DNS packets have been transmitted, who hosts are talking to, MAC addresses, etc
+# use pip to install scapy, jinja2, and graphviz
 
 import scapy.all
 import argparse
