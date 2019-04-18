@@ -17,10 +17,12 @@ The script parses each packet in the pcap for the following:
 ## Tools
 ### scapy
 capmap uses the [scapy](https://scapy.readthedocs.io/en/latest/index.html) library to parse through a pcap file.  
-It parses through TCP, UDP, ICMP, IP, and ARP data.
+It parses through TCP, UDP, ICMP, IP, MAC, and ARP data.
 ```
 [IP.src]
 [IP.dst]
+[Ether.src]
+[Ether.dst]
 [TCP.sport]
 [TCP.dport]
 [UDP.sport]
@@ -39,7 +41,8 @@ file_loader = FileSystemLoader('templates')
     env = Environment(loader=file_loader)
     template = env.get_template('capmap.html')
     # render the template and pass in lists for processing in the template
-    render = template.render(trans=trans_count, ports=port_count, dns=dns_queries, arp=arps, packets=packet_count)
+    render = template.render(trans=trans_sorted, ports=port_sorted, dns=dns_queries, arp=arps,      
+                             packets=packet_sorted,macs=mac_sorted)
     # write the completed template to the specified .html file
     filename = os.path.abspath("html/index.html")
     with open(filename, 'w') as f:
@@ -47,12 +50,12 @@ file_loader = FileSystemLoader('templates')
 ```
 in templates/capmap.html:
 ```
-{% for key, value in packets.items() %}
+{% for key, value in packets %}
         <tr>
             <td>{{ key }}</td>
             <td>{{ value }}</td>
         </tr>
-        {% endfor %}
+{% endfor %}
 ```
 
 ### graphviz
@@ -61,18 +64,22 @@ capmap uses the [graphviz](https://graphviz.readthedocs.io/en/stable/) library t
 
 ![Image of Network Graph](graph-output/net-map.svg)
 ```
-dot = Digraph(comment='Network Diagram', format='svg')
+net_diagram = Digraph(comment='Network Diagram', format='svg')
+    net_diagram.attr('node', shape='square')
+    # initialize list
+    already_done = []
+    # zip together source IPs and destination IPs
     for address_pair in zip(src_ips, dst_ips):
         if address_pair not in already_done:
             # create nodes for the source IP and destination IP
-            dot.node(address_pair[0])
-            dot.node(address_pair[1])
+            net_diagram.node(address_pair[0])
+            net_diagram.node(address_pair[1])
             # create an edge between the source and destination
-            dot.edge(address_pair[0], address_pair[1])
+            net_diagram.edge(address_pair[0], address_pair[1])
             # append to the list of matched hosts
             already_done.append(address_pair)
     # render a graph to the specified file
-    dot.render('graph-output/net-map')
+    net_diagram.render('graph-output/net-map')
 ```
 
 ## Tutorial
