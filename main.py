@@ -22,8 +22,22 @@ __version__ = '1.0'
 def _args():
     """The _args function uses the argparse library to parse the user's command line arguments
     :return: The command line arguments"""
-    arg_parser = argparse.ArgumentParser(description='Outputs a visualization and the statistics of a packet capture')
-    arg_parser.add_argument('pcap_file', help='A pcap file')
+    arg_parser = argparse.ArgumentParser(description='capmap outputs a visual and the statistics of a packet capture')
+    # pcap_args.add_argument('pcap_file', help='A pcap file')
+    capmap_args = arg_parser.add_mutually_exclusive_group(required=True)
+    capmap_args.add_argument('-p', '--pcap',
+                             metavar='pcap',
+                             help='A pcap file')
+
+    capmap_args.add_argument('-s', '--scan',
+                             action='store_true',
+                             help='Start a packet capture')
+
+    arg_parser.add_argument('-n', '--num',
+                            default=200,
+                            type=int,
+                            metavar='packets',
+                            help='Number of packets to capture')
     return arg_parser.parse_args()
 
 
@@ -49,6 +63,9 @@ def _parse_pcap(pcap):
         if IP in packet:
             src = packet['IP.src']
             dst = packet['IP.dst']
+            packet_string = src + " -> " + dst
+            convo_list.append(packet_string)
+            master_ip_list.extend([src, dst])
             mac_src = packet['Ether.src']
             mac_dst = packet['Ether.dst']
             master_mac_list.extend([mac_src, mac_dst])
@@ -56,11 +73,6 @@ def _parse_pcap(pcap):
             if TCP in packet:
                 # append TCP to list of transport protocols
                 transport_list.append('TCP')
-                # append string of source -> destination to list of conversations
-                packet_string = src + " -> " + dst
-                convo_list.append(packet_string)
-                # append source and destination addresses to list of addresses
-                master_ip_list.extend([src, dst])
                 # append source and destination ports to list of ports
                 src_port = packet['TCP.sport']
                 dst_port = packet['TCP.dport']
@@ -69,11 +81,6 @@ def _parse_pcap(pcap):
             elif UDP in packet:
                 # append UDP to list of transport protocols
                 transport_list.append('UDP')
-                # append string of source -> destination to list of conversations
-                packet_string = src + " -> " + dst
-                convo_list.append(packet_string)
-                # append source and destination addresses to list of addresses
-                master_ip_list.extend([src, dst])
                 # append source and destination ports to list of ports
                 src_port = packet['UDP.sport']
                 dst_port = packet['UDP.dport']
@@ -87,8 +94,8 @@ def _parse_pcap(pcap):
                         # cast name of query to a string
                         query = packet['DNSQR.qname']
                         str_query = str(query, 'utf-8')
-                    # append source address, source port, query, destination address, and destination port to dns list
-                    dns_query.extend((src, src_port, str_query, dst, dst_port))
+                        # append src address, src port, query, dst address, and dst port to dns list
+                        dns_query.extend((src, src_port, str_query, dst, dst_port))
                     dns_query_list.append(dns_query)
             # if ICMP is in packet
             elif ICMP in packet:
@@ -115,6 +122,18 @@ def _parse_pcap(pcap):
 
     statistics(src_ips, dst_ips, convo_list, master_mac_list, master_port_list, transport_list, dns_query_list,
                arp_list)
+
+
+def pcapture(packet_num):
+    """The pcapture function uses scapy to perform a packet capture
+    :param packet_num: The number of packets to capture in the scan
+    :return: None"""
+    print(f"Capturing {packet_num} packets...")
+    capture = scapy.all.sniff(count=packet_num)
+    print("Enter a filename for the capture: ", end="")
+    filename = "pcaps/" + input()
+    scapy.all.wrpcap(filename, capture)
+    _parse_pcap(filename)
 
 
 def statistics(src_ips, dst_ips, transmissions, mac_list, port_list, transport, dns_queries, arps):
@@ -144,38 +163,63 @@ def statistics(src_ips, dst_ips, transmissions, mac_list, port_list, transport, 
     mac_sorted = collections.Counter.most_common(mac_count)
 
     print("DONE\nVisualizing...")
+    print("Would you like the output on the command-line instead? (y or n) ", end="")
+    cmdline = input()
+    if cmdline == "y":
+        print("-----Conversations-----")
+        for key, value in packet_sorted:
+            print(f"{key}, {value} times")
+        print("-----MAC Addresses-----")
+        for key, value in mac_sorted:
+            print(f"{key} {value} times")
+        print("-----DNS Queries-----")
+        print("Source IP\tSource Port\tDNS Query\tDestination IP\tDestination Port")
+        for line in dns_queries:
+            print(f"{line[0]}\t{line[1]}\t{line[2]}\t{line[3]}\t{line[4]}")
+        print("-----ARP Requests and Replies-----\nRequest:1, Reply:2")
+        print("Source IP\tDestination IP\tOpcode")
+        for line in arps:
+            print(f"{line[0]}\t{line[1]}\t{line[2]}")
+        print("-----Port Numbers-----")
+        for key, value in port_sorted:
+            print(f"{key} {value} times")
+        print("-----Transport Protocols-----")
+        for key, value in trans_sorted:
+            print(f"{key} {value} times")
+    elif cmdline == "n":
+        # create a graph for the network hosts
+        net_diagram = Digraph(comment='Network Diagram', format='svg')
+        net_diagram.attr('node', shape='square')
+        # initialize list
+        already_done = []
+        # zip together source IPs and destination IPs
+        for address_pair in zip(src_ips, dst_ips):
+            if address_pair not in already_done:
+                # create nodes for the source IP and destination IP
+                net_diagram.node(address_pair[0])
+                net_diagram.node(address_pair[1])
+                # create an edge between the source and destination
+                net_diagram.edge(address_pair[0], address_pair[1])
+                # append to the list of matched hosts
+                already_done.append(address_pair)
+        # render a graph to the specified file
+        net_diagram.render('graph-output/net-map')
 
-    # create a graph for the network hosts
-    net_diagram = Digraph(comment='Network Diagram', format='svg')
-    net_diagram.attr('node', shape='square')
-    # initialize list
-    already_done = []
-    # zip together source IPs and destination IPs
-    for address_pair in zip(src_ips, dst_ips):
-        if address_pair not in already_done:
-            # create nodes for the source IP and destination IP
-            net_diagram.node(address_pair[0])
-            net_diagram.node(address_pair[1])
-            # create an edge between the source and destination
-            net_diagram.edge(address_pair[0], address_pair[1])
-            # append to the list of matched hosts
-            already_done.append(address_pair)
-    # render a graph to the specified file
-    net_diagram.render('graph-output/net-map')
-
-    # load the template from the specified folder
-    file_loader = FileSystemLoader('templates')
-    env = Environment(loader=file_loader)
-    template = env.get_template('capmap.html')
-    # render the template and pass in lists for processing in the template
-    render = template.render(trans=trans_sorted, ports=port_sorted, dns=dns_queries, arp=arps, packets=packet_sorted,
-                             macs=mac_sorted)
-    # write the completed template to the specified .html file
-    filename = os.path.abspath("html/index.html")
-    with open(filename, 'w') as f:
-        f.write(render)
-    # open the .html file in the default web browser
-    webbrowser.open_new_tab(filename)
+        # load the template from the specified folder
+        file_loader = FileSystemLoader('templates')
+        env = Environment(loader=file_loader)
+        template = env.get_template('capmap.html')
+        # render the template and pass in lists for processing in the template
+        render = template.render(trans=trans_sorted, ports=port_sorted, dns=dns_queries, arp=arps,
+                                 packets=packet_sorted, macs=mac_sorted)
+        # write the completed template to the specified .html file
+        filename = os.path.abspath("html/index.html")
+        with open(filename, 'w') as f:
+            f.write(render)
+        # open the .html file in the default web browser
+        webbrowser.open_new_tab(filename)
+    else:
+        print("Please choose y or n")
 
     print("DONE")
 
@@ -185,12 +229,14 @@ def main():
     adds to the statistics of the subnet
     :return: nothing"""
     args = _args()
-    _parse_pcap(args.pcap_file)
-    print(f"{str(args.pcap_file)} has been analyzed. Please open html/index.html if not done automatically.")
+    if args.scan:
+        pcapture(args.num)
+    else:
+        _parse_pcap(args.pcap)
+    print("Analysis finished. Please open html/index.html if not done automatically.")
 
     sys.exit(0)
 
 
 if __name__ == '__main__':
     main()
-
